@@ -1,7 +1,7 @@
 import lstm
 import boost
 import RandomForest as RF
-import predict as prd
+import methods.predict as prd
 
 import profit
 
