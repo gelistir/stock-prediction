@@ -800,6 +800,15 @@ def final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample,
 
 #################################################################################
 def main():
+	"""Main
+
+	Parameters:       
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time
+		est_df (dataFrame) : contains the predicted values and the time
+		lenTrain (int) : contains the number of training data
+	"""
 
 	stock = "AMZN.csv"
 	test_proportion = 0.15
