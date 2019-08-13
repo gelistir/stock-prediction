@@ -233,7 +233,7 @@ def knn(data, startAt, stopAt=0):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
-
+    
     from fastai.tabular import add_datepart
     add_datepart(data_copy, 'Date')
     data_copy.drop('Elapsed', axis=1, inplace=True)
@@ -244,7 +244,7 @@ def knn(data, startAt, stopAt=0):
     data_copy['mon_fri'] = 0
     data_copy['mon_fri'].mask(data_copy['Dayofweek'].isin([0,4]), 1, inplace=True)
     data_copy['mon_fri'].where(data_copy['Dayofweek'].isin([0,4]), 0, inplace=True)
-
+    
     train = data_copy[:startAt]
     valid = data_copy[startAt:stopAt]
 
