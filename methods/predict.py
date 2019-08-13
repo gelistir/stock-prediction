@@ -9,12 +9,21 @@ import random
 
 
 def differentiate(data, order=1):
-    '''
+    """
     Diffenrentiates data to make it stationnary:
      - Order 1 : X(n) <- X(n) - X(n-1)
      - Order 2 : X(n) <- X(n) - 2 X(n-1) - X(n-2)
      - ‘return-price’ : X(n) <- (X(n) - X(n-1)) / X(n-1)
-    '''
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data
+        order (str): Order of the differenciation
+            (default is 1)
+
+    Returns:
+        data_diff (pandas.DataFrame): Dataframe with differentiated close column
+    """
+
     data_diff = data.copy()
     if order==1:
         data_diff['Close'] = data['Close'].diff()
@@ -31,19 +40,42 @@ def differentiate(data, order=1):
 
 
 def get_alpha_url(symbol, api_key, interval='5min'):
+    """
+    Constructs URL to use the AlphaVantage API
+
+    Parameters:
+        symbol (str): Symbol of the company
+        api_key (str): API key provided by AlphaVantage
+        interval (str): Frequency of time series
+            (default is '5min')
+
+    Returns:
+        (str): AlpahaVantage URL
+    """
+
     return 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol='+symbol+'&interval='+interval+'&apikey='+api_key+'&datatype=csv&outputsize=full'
 
 
 def prepare_data(symbol, columns=['timestamp', 'close'], distant=False, api_key=None):
-    '''
-    If distant=False, searches for the csv file corresponding to the company.
-    If distant=True, fetches data from the alphavantage api (provide an api key).
+    """
+    Build a pandas.DataFrame containing the date and the close column.
+    Get either the data from a csv file or from an API.
+    The date column must be YYYY-MM-DD
 
-    Columns is a list that contains the dates column name and the values column name
-    Convert the date column to datetime and sort data from
-    the CSV file by date by ascending order.
-    The CSV must contain a date column (YYYY-MM-DD)
-    '''
+    Parameters:
+        symbol (str): Symbol of the company
+        columns (list): The name of the date and close colums
+            (default is ['timestamp', 'close'])
+        distant (bool): Specifies wether data is retreived from a local file or
+                        from and API
+            (default is False)
+        api_key (str): API key provided by AlphaVantage
+
+    Returns:
+        new_data (pandas.DataFrame): Dataframe with date and close column
+                                     ordered by chronologicaly
+    """
+
     if distant==True and api_key is not None:
         urlData = requests.get(get_alpha_url(symbol, api_key)).content
         if '"Note": "Thank you for using Alpha Vantage!' in str(urlData):
@@ -69,7 +101,16 @@ def inv_differenciate(predictions, diff_order, last_value=None):
     Operates the inverse operation of differenciation.
     last_value is required when the order is > 0 to rebuilt data and corresponds
     to the last known value.
+
+    Parameters:
+        predictions (list): The predicted values given by the forecast
+        diff_order (str): Order of the differenciation
+        last_value (float): The last known value
+
+    Returns:
+        return_preds (list): list with the rebuilt predictions
     """
+
     if(diff_order==0):
         return np.array(predictions)
     elif(diff_order==1):
@@ -96,9 +137,22 @@ def inv_differenciate(predictions, diff_order, last_value=None):
 
 
 def insert_predictions(data, predictions, startAt, stopAt, diff_order=0):
-    '''
-    Adds the predicted values to the data DataFrame and cancels the diffenrentiation.
-    '''
+    """
+    Creates a ‘Predictions’ column and adds the predictions into it.
+    If needed, also cancels the differenciation.
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        predictions (list): The predicted values given by the forecast
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+        diff_order (str): Order of the differenciation
+            (default is 0)
+
+    Returns:
+        data (pandas.DataFrame): Initial data but with a Predictions column
+    """
 
     if(stopAt==0):
         stopAt = len(data)
@@ -116,10 +170,22 @@ def insert_predictions(data, predictions, startAt, stopAt, diff_order=0):
 
 
 def plot_predictions(data, predictions, startAt, stopAt=0, diff_order=0, print_rms=False):
-    '''
+    """
     Plots the known data in a color, the predicted data in a second color
     and if it exists the valid data assiciated to the predictions in a thrid one
-    '''
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        predictions (list): The predicted values given by the forecast
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+        diff_order (str): Order of the differenciation
+            (default is 0)
+        print_rms (bool): Specifies wether the Root Mean Square error should be
+                          printed
+            (default is False)
+    """
 
     data = insert_predictions(data, predictions, startAt, stopAt, diff_order)
 
@@ -139,25 +205,40 @@ def plot_predictions(data, predictions, startAt, stopAt=0, diff_order=0, print_r
 
 
 def calculate_rms(a, b):
-    '''
-    Caclulate the root mean square between two lists a and b
-    '''
+    """
+    Caclulate the root mean square between two lists a and b of the same length
+
+    Parameters:
+        a (list): A list of values
+        b (list): A list of values
+
+    Returns:
+        rms (float): The root mean square between a and b
+    """
 
     rms = np.sqrt(np.mean(np.power((np.array(a)-np.array(b)),2)))
 
     return rms
 
 
-def moving_average(data, startAt, stopAt=0):
-    '''
+def moving_average(data, startAt, stopAt=None):
+    """
     Applies the moving average to data to predict points whose index is
     between startAt and stopAt.
     If stopAt is not provided, default value is the lenght of data.
-    If do_rms is set to True, prints the rms between the predicted values and
-    the known values.
-    '''
 
-    if(stopAt==0):
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
+
+    if(stopAt is None):
         stopAt = len(data)
 
     train = data[:startAt]
@@ -174,18 +255,26 @@ def moving_average(data, startAt, stopAt=0):
     return predictions
 
 
-def linear_regression(data, startAt, stopAt=0):
-    '''
-    Applies the linear regression method to data to predict points whose index is
-    between startAt and stopAt.
+def linear_regression(data, startAt, stopAt=None):
+    """
+    Applies the linear regression method to data to predict points whose index
+    is between startAt and stopAt.
     If stopAt is not provided, default value is the lenght of data.
-    If do_rms is set to True, prints the rms between the predicted values and
-    the known values.
-    '''
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
 
     data_copy = data.copy()
 
-    if(stopAt==0):
+    if(stopAt is None):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
@@ -218,18 +307,26 @@ def linear_regression(data, startAt, stopAt=0):
     return predictions
 
 
-def knn(data, startAt, stopAt=0):
-    '''
+def knn(data, startAt, stopAt=None):
+    """
     Classifies the point between startAt and stopAt with the k-nearest
     neighbors method. Automaticaly finds the best number of neighbors.
     If stopAt is not provided, default value is the lenght of data.
-    If do_rms is set to True, prints the rms between the predicted values and
-    the known values.
-    '''
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
 
     data_copy = data.copy()
 
-    if(stopAt==0):
+    if(stopAt is None):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
@@ -271,16 +368,24 @@ def knn(data, startAt, stopAt=0):
     return predictions
 
 
-def arima_auto(data, startAt, stopAt=0):
-    '''
-    Applies the moving average to data to predict points whose index is
-    between startAt and stopAt.
+def arima_auto(data, startAt, stopAt=None):
+    """
+    Applies the scikit lean auto_arima function to data to predict points whose
+    index is between startAt and stopAt.
     If stopAt is not provided, default value is the lenght of data.
-    If do_rms is set to True, prints the rms between the predicted values and
-    the known values.
-    '''
 
-    if(stopAt==0):
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
+
+    if(stopAt is None):
         stopAt = len(data)
 
     periods = stopAt - startAt
@@ -301,18 +406,26 @@ def arima_auto(data, startAt, stopAt=0):
     return predictions
 
 
-def prophet(data, startAt, stopAt=0, do_rms=False):
-    '''
+def prophet(data, startAt, stopAt=None):
+    """
     Applies the Prophet algorithm to data to predict points whose index is
     between startAt and stopAt.
     If stopAt is not provided, default value is the lenght of data.
-    If do_rms is set to True, prints the rms between the predicted values and
-    the known values.
-    '''
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
 
     data_copy = data.copy()
 
-    if(stopAt==0):
+    if(stopAt is None):
         stopAt = len(data)
 
     periods = stopAt - startAt
@@ -337,14 +450,26 @@ def prophet(data, startAt, stopAt=0, do_rms=False):
     return predictions
 
 
-def svm(data, startAt, stopAt=0):
-    '''
+def svm(data, startAt, stopAt=None):
+    """
+    Applies the Support Vector Machine to forecast data whose index is between
+    startAt and stopAt.
+    If stopAt is not provided, forecasts until the end of data.
 
-    '''
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
 
     data_copy = data.copy()
 
-    if(stopAt==0):
+    if(stopAt is None):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
@@ -377,14 +502,27 @@ def svm(data, startAt, stopAt=0):
     return predictions
 
 
-def MLPRegression(data, startAt, stopAt=0, **kwargs):
-    '''
+def MLPRegression(data, startAt, stopAt=None, **kwargs):
+    """
+    Applies the Multi-Layer Perceptron regression to data to forecast values
+    between startAt and stopAt.
+    If stopAt is not provided, forecast until the end of data.
 
-    '''
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+        **kwargs: Additionnal arguments for MLPRegressor Class
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+    """
 
     data_copy = data.copy()
 
-    if(stopAt==0):
+    if(stopAt is None):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
@@ -418,6 +556,29 @@ def MLPRegression(data, startAt, stopAt=0, **kwargs):
 
 
 def theta_method(data, startAt, stopAt=None, theta=0, alpha=0.5):
+    """
+    Applies the theta method to data to forecast values between startAt and
+    stopAt.
+    If stopAt is not provided, forecast until the end of data.
+    See: https://robjhyndman.com/papers/Theta.pdf
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+        theta (float): Value of theta paramter (must be 0 for now)
+            (default is 0)
+        alpha (float): Value of alpha paramter (must be between 0 and 1)
+            (default is 0.5)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+
+    Raises:
+        ArithmeticError: If theta is not 0 or alpha is not between 0 and 1
+    """
     if stopAt is None:
         stopAt = len(data)
 
@@ -463,6 +624,29 @@ def theta_method(data, startAt, stopAt=None, theta=0, alpha=0.5):
 
 
 def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
+    """
+    Applies the theta method to data to forecast values between startAt and
+    stopAt.
+    If stopAt is not provided, forecast until the end of data.
+    See: https://robjhyndman.com/papers/Theta.pdf
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        startAt (int): Index where the forecast starts
+        stopAt (int): Index where the forecast stops
+            (default is None)
+        theta (float): Value of theta paramter (must be 0 for now)
+            (default is 0)
+        alpha (float): Value of alpha paramter (must be between 0 and 1)
+            (default is 0.5)
+
+    Returns:
+        predictions (list): The forecast from startAt up to stopAt
+
+    Raises:
+        NotImplementedError: This function is not working as it should be
+    """
     raise NotImplementedError("This function is not available")
     if stopAt is None:
         stopAt = len(data)
@@ -514,6 +698,20 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
 
 
 def getWeights(data, methods, iterations=10):
+    """
+    Calculates the weights of the forecast methods to correct predictions.
+
+    Parameters:
+        data (pandas.DataFrame): Data returned by prepare_data (may be
+                                 differentiated)
+        methods (list): The list of the methods to use (must pass a list
+                        of functions, not a list of strings)
+        iterations (int): Number of iterations
+
+    Returns:
+        (dict): A dictionnary with the methods function name and the
+                corresponding weight
+    """
     weights = np.zeros(len(methods))
     text_trap = io.StringIO()
     for i in range(iterations):
