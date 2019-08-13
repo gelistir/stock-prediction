@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import requests
-import io
+import sys, io
+import random
 
 
 def differentiate(data, order=1):
@@ -533,3 +534,23 @@ def max_profit(data, buy_time, method, periods, **kwargs):
 
 
     return predictions
+
+
+def getWeights(data, methods, iterations=10):
+    weights = np.zeros(len(methods))
+    text_trap = io.StringIO()
+    for i in range(iterations):
+        point = random.randint(100, len(data)-1)
+        actualValue = data['Close'][point+1]
+        predictions = np.zeros(len(methods))
+        for j, method in enumerate(methods):
+            sys.stdout = text_trap # disable printing
+            predictions[j] = np.abs(method(data, point, point+2)[0] - actualValue)
+            sys.stdout = sys.__stdout__ # enable printing
+        try:
+            predictions = 1/predictions / sum(1/predictions)
+        except RuntimeWarning:
+            continue
+        weights = (weights * i + predictions)/(i+1)
+
+    return {method.__name__:weights[i] for i,method in enumerate(methods)}
