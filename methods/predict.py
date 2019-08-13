@@ -47,7 +47,7 @@ def get_alpha_url(symbol, api_key, interval='5min'):
         symbol (str): Symbol of the company
         api_key (str): API key provided by AlphaVantage
         interval (str): Frequency of time series
-            (defaul is '5min')
+            (default is '5min')
 
     Returns:
         (str): AlpahaVantage URL
