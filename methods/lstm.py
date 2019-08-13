@@ -35,7 +35,7 @@ def data():
 
     
 def predict(new_data):
-	"""Split data into test training data. 
+	"""Split data into test  and training data. 
 	Creates and trains the model and then makes the required predictions.
 
 	Parameters:
