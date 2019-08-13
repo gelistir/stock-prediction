@@ -50,7 +50,7 @@ def get_alpha_url(symbol, api_key, interval='5min'):
             (defaul is '5min')
 
     Returns:
-        AlpahaVantage URL
+        (str): AlpahaVantage URL
     """
 
     return 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol='+symbol+'&interval='+interval+'&apikey='+api_key+'&datatype=csv&outputsize=full'
