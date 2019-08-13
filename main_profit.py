@@ -78,12 +78,6 @@ if (butPrgm == "2" ):
 		 	predictions = prd.svm(diff_data, startAt)
 		if (choixMethode == "9"):
 		 	predictions = prd.theta_method(diff_data, startAt, alpha=0.12)
-
-
-
-
-
-
 		if (choixMethode == "10"):
 			print("Enter the number of the required methods (Random Forest unavailable). To stop enter 0")
 			i = ["1"]
