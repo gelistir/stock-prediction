@@ -13,6 +13,7 @@ This file contains the following functions:
 - `insert_predictions`
 - `plot_predictions`
 - `calculate_rms`
+- `getWeights`
 
 ### Forecast functions
 - `moving_average`
