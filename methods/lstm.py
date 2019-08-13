@@ -7,6 +7,15 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM
 
 def data():
+	"""Load the data from the .csv, set the index and create the dataframe
+	while sorting the data according to time so that it can be used.
+
+	Parameters:
+       
+
+	Returns:
+		new_data (dataFrame): contains the closing prices of the share and the time
+	"""
 	#read the file
 	df = pd.read_csv('AMZN.csv', sep= ",")
 	print(df.head())
@@ -23,9 +32,23 @@ def data():
 	new_data.drop('timestamp', axis=1, inplace=True)
 	return new_data
 
+
     
 def predict(new_data):
-	#creating train and test sets
+	"""Split data into test training data. 
+	Creates and trains the model and then makes the required predictions.
+
+	Parameters:
+		new_data (dataFrame): contains the closing prices of the share and the time
+       
+
+	Returns:
+		closing_price (list): contains the predicted closing prices
+		lenTrain (int) : contains the number of training data
+		train (list): contains the data used for training
+		valid (list) : contains test data (real values of closing prices)
+	"""
+	#split into train and test sets
 	dataset = new_data.values
 	lenTrain = 950
 	lenValid = len(new_data)-lenTrain
@@ -42,7 +65,7 @@ def predict(new_data):
 	x_train, y_train = np.array(x_train), np.array(y_train)
 	x_train = np.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
 
-	# create and fit the LSTM network
+	#create and fit the LSTM network
 	model = Sequential()
 	model.add(LSTM(units=50, return_sequences=True, input_shape=(x_train.shape[1],1)))
 	model.add(LSTM(units=50))
@@ -64,7 +87,21 @@ def predict(new_data):
 	return closing_price, lenTrain, train, valid
 
 def plot(new_data, lenTrain, closing_price, train, valid):
-	#for plotting
+	"""Plots closing prices over time for training data, test data and predictions.
+	Calculates the RMSE
+
+	Parameters:
+		new_data (dataFrame): contains the closing prices of the share and the time
+		closing_price (list): contains the predicted closing prices
+		lenTrain (int) : contains the number of training data
+		train (list): contains the data used for training
+		valid (list) : contains test data (real values of closing prices)
+       
+
+	Returns:
+
+	"""
+	#plot
 	train = new_data[:lenTrain]
 	valid = new_data[lenTrain:]
 	valid['Predictions'] = closing_price
@@ -72,6 +109,7 @@ def plot(new_data, lenTrain, closing_price, train, valid):
 	plt.plot(valid[['close','Predictions']])
 	plt.title('LSTM')
 	plt.show()
+	#rmse
 	rms = np.sqrt(np.mean(np.power((np.array(valid['close'])-np.array(valid['Predictions'])),2)))
 	print(rms)
 
