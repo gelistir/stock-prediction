@@ -4,6 +4,17 @@ import numpy as np
 
 
 def jourlejour(lenTrain, prix, closing_price):
+	"""Launches the simulation for a method that makes predictions from t to t+1
+
+	Parameters:
+		lenTrain (int) : contains the number of training data
+		prix (list) : closing prices of the share for the entire period
+		closing_price (list) : predicted  closing prices of the share for the test period 
+       
+
+	Returns:
+
+	"""
 	action_detenu = 0
 	argent = 0.0
 	histo_argent = [0.0]
@@ -85,6 +96,17 @@ def jourlejour(lenTrain, prix, closing_price):
 ##########################################################
 
 def periodecomplete(lenTrain, prix, closing_price):
+	"""Launches the simulation for a method that makes predictions for the entier period
+
+	Parameters:
+		lenTrain (int) : contains the number of training data
+		prix (list) : closing prices of the share for the entire period
+		closing_price (list) : predicted  closing prices of the share for the test period 
+       
+
+	Returns:
+
+	"""
 	prix_actuel = prix[lenTrain-1]
 	max_prediction = max(closing_price)
 	gain = max_prediction - prix_actuel
