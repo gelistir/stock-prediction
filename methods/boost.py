@@ -46,19 +46,19 @@ def mean_and_std(df, col, N):
 	Returns:
 		df_out (dataFrame): contains the closing prices of the share and the time with 2 new columns containing the means and the 				standard deviations
 	"""
-    means = df[col].rolling(window = N, min_periods=1).mean()
-    stds = df[col].rolling(window = N, min_periods=1).std()
-    # Add one timestep to the predictions
-    means = np.concatenate((np.array([np.nan]), np.array(means[:-1])))
-    stds = np.concatenate((np.array([np.nan]), np.array(stds[:-1])))
-    df_out = df.copy()
-    df_out[col + '_mean'] = means
-    df_out[col + '_std'] = stds
-    return df_out
+	means = df[col].rolling(window = N, min_periods=1).mean()
+	stds = df[col].rolling(window = N, min_periods=1).std()
+	# Add one timestep to the predictions
+	means = np.concatenate((np.array([np.nan]), np.array(means[:-1])))
+	stds = np.concatenate((np.array([np.nan]), np.array(stds[:-1])))
+	df_out = df.copy()
+	df_out[col + '_mean'] = means
+	df_out[col + '_std'] = stds
+	return df_out
 
 
 def scale_row(row, feat_mean, feat_std):
-	"""Scales the row data.
+    """Scales the row data.
 
 	Parameters:
 		row (dataFrame): contains the closing prices of the share and the time
@@ -68,7 +68,7 @@ def scale_row(row, feat_mean, feat_std):
 
 	Returns:
 		the scaled data
-	"""
+    """
     feat_std = 0.001 if feat_std == 0 else feat_std # To avoid division by zero
     return (row-feat_mean) / feat_std
 
@@ -97,7 +97,7 @@ def modelisation(X_train_scaled, \
                          colsample_bytree=colsample_bytree,
                          colsample_bylevel=colsample_bylevel,
                          gamma=gamma)
-	"""Create the model.
+    """Create the model.
 
 	Parameters:
 
@@ -106,7 +106,7 @@ def modelisation(X_train_scaled, \
 	Returns:
 		rmse (string): root mean squared error between the predictions and the right values
 		est (list): contains the predictions
-	"""
+    """
     # Train the model
     model.fit(X_train_scaled, y_train_scaled)
     # Get predicted labels and scale back to original range
