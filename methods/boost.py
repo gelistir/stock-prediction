@@ -14,6 +14,16 @@ from matplotlib import pyplot as plt
 
 
 def load_data(stock):
+	"""Load the data from the .csv and create the dataframe
+	while sorting the data according to time so that it can be used.
+
+	Parameters:
+		stock (string): name of the file containing the data
+       
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time
+	"""
 	df = pd.read_csv(stock, sep = ",")
 	df.loc[:, 'Date'] = pd.to_datetime(df['timestamp'],format='%Y-%m-%d %H:%M:%S')
 	df.columns = [str(x).lower().replace(' ', '_') for x in df.columns]
@@ -25,6 +35,17 @@ def load_data(stock):
 
 
 def mean_and_std(df, col, N):
+	"""Calculates the means and the standard deviation of a column of the dataFrame.
+
+	Parameters:
+		df (dataFrame): contains the closing prices of the share and the time
+		col (string) : name of the column
+		N (int): number of data used to calculate
+       
+
+	Returns:
+		df_out (dataFrame): contains the closing prices of the share and the time with 2 new columns containing the means and the 				standard deviations
+	"""
     means = df[col].rolling(window = N, min_periods=1).mean()
     stds = df[col].rolling(window = N, min_periods=1).std()
     # Add one timestep to the predictions
@@ -37,7 +58,18 @@ def mean_and_std(df, col, N):
 
 
 def scale_row(row, feat_mean, feat_std):
-    feat_std = 0.001 if feat_std == 0 else feat_std # to avoid division by zero
+	"""Scales the row data.
+
+	Parameters:
+		row (dataFrame): contains the closing prices of the share and the time
+		feat_mean (string) : mean of the data
+		feat_std (int): std of the data
+       
+
+	Returns:
+		the scaled data
+	"""
+    feat_std = 0.001 if feat_std == 0 else feat_std # To avoid division by zero
     return (row-feat_mean) / feat_std
 
 
@@ -65,6 +97,16 @@ def modelisation(X_train_scaled, \
                          colsample_bytree=colsample_bytree,
                          colsample_bylevel=colsample_bylevel,
                          gamma=gamma)
+	"""Create the model.
+
+	Parameters:
+
+       
+
+	Returns:
+		rmse (string): root mean squared error between the predictions and the right values
+		est (list): contains the predictions
+	"""
     # Train the model
     model.fit(X_train_scaled, y_train_scaled)
     # Get predicted labels and scale back to original range
@@ -75,6 +117,15 @@ def modelisation(X_train_scaled, \
 
 
 def plot_adjclose_time(df):
+	"""Plot the closing price of the share against the time.
+
+	Parameters:
+		df (dataFrame): contains the closing prices of the share and the time
+
+	Returns:
+
+	"""
+
 	'''
 	ax = df.plot(y='adj_close', style='g-', grid=True)
 	ax.set_ylabel("USD")
@@ -82,6 +133,15 @@ def plot_adjclose_time(df):
 	'''
 
 def diff(df):
+	"""Calculate between high and low and between open and close.
+
+	Parameters:
+		df (dataFrame): contains the closing prices of the share and the time
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time AND new columns containing differences
+
+	"""
 	# For each day, calculate difference between high and low
 	df['diff_hl'] = df['high'] - df['low']
 	df.drop(['high', 'low'], axis=1, inplace=True)
@@ -93,7 +153,17 @@ def diff(df):
 
 
 def feature_engineering(df, N):
-	# Add a column 'order_day' to indicate the order of the rows by date
+	"""Add a column 'order_day' to indicate the order of the rows by date.
+
+	Parameters:
+		df (dataFrame): contains the closing prices of the share and the time
+		N (int): number of data used to calculate
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time AND new columns
+
+	"""
+	# Add a column 'order_day'
 	df['order_day'] = [x for x in list(range(len(df)))]
 	merging_keys = ['order_day']
 	# List of columns that we will use to create lags
@@ -111,6 +181,16 @@ def feature_engineering(df, N):
 
 
 def get_mean_std(df, N):
+	"""Gets the means and the standard deviation for different columns of the dataFrame.
+
+	Parameters:
+		df (dataFrame): contains the closing prices of the share and the time
+		N (int): number of data used to calculate
+       
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time with new columns containing the means and the 				standard deviations
+	"""
 	cols_list = ["adj_close","diff_hl","diff_oc","volume"]
 	for col in cols_list:
 	    df = mean_and_std(df, col, N)
@@ -119,7 +199,33 @@ def get_mean_std(df, N):
 
 
 def split_scale(cv_proportion, test_proportion, df, N):
-	# Split into train, development and test set
+	"""Split data into test, validation and training data. 
+	Scales the data.
+
+	Parameters:
+		cv_proportion (float) : proportion of data to be used as validation data
+		test_proportion (float) : proportion of data to be used as test data
+		df (dataFrame): contains the closing prices of the share and the time
+		N (int): number of data used to calculate
+       
+
+	Returns:
+		train (list): contains the data used for training
+		cv (list): contains the data used for validation
+		test (list): contains the data used for test
+		train_scaled (list): contains the data used for training but scaled
+		X_train_scaled (list)
+		X_cv_scaled (list)
+		X_train_cv_scaled (list)
+		X_sample_scaled (list)
+		y_cv (list)
+		y_train (list)
+		y_train_scaled (list)
+		y_train_cv_scaled (list)
+		y_sample (list)
+		scaler (scaler) : to scale the data
+	"""
+	# Split into train, validation and test set
 	nb_cv = int(cv_proportion*len(df))
 	nb_test = int(test_proportion*len(df))
 	nb_train = len(df) - nb_cv - nb_test
@@ -127,7 +233,7 @@ def split_scale(cv_proportion, test_proportion, df, N):
 	cv = df[nb_train:nb_train+nb_cv]
 	train_cv = df[:nb_train+nb_cv]
 	test = df[nb_train+nb_cv:]
-	# Scale the train, development and test set
+	# Scale the train, validation and test set
 	cols_list = ["adj_close","diff_hl","diff_oc","volume"]
 	cols_to_scale = ["adj_close"]
 	for j in range(1, N+1):
@@ -184,6 +290,22 @@ def split_scale(cv_proportion, test_proportion, df, N):
 
 
 def plot_close_vs_time (train, cv, test):
+	"""Plot the closing price against the time.
+
+	Parameters:
+		train (list): contains the data used for training
+		cv (list): contains the data used for validation
+		test (list): contains the data used for test
+
+	Returns:
+
+	"""
+
+	'''
+	ax = df.plot(y='adj_close', style='g-', grid=True)
+	ax.set_ylabel("USD")
+	plt.show()
+	'''
 	'''
 	ax = train.plot( y='adj_close', style='g-', grid=True)
 	ax = cv.plot( y='adj_close', style='y-', grid=True, ax=ax)
@@ -195,6 +317,25 @@ def plot_close_vs_time (train, cv, test):
 	'''
 
 def create_model(X_train_scaled, y_train_scaled, model_seed, n_estimators, max_depth, learning_rate, min_child_weight, subsample, colsample_bytree, colsample_bylevel, gamma):
+	"""Create the model with the train data and the hyper-parameters found in the others functions
+
+	Parameters:
+		X_train_scaled (list) : closing prices for the train splited and scaled in another function
+		y_train_scaled (list) : closing prices for the train splited and scaled in another function
+		model_seed (int) : hyper-parameter
+		n_estimators (int) : Number of different trees to be tested
+		max_depth (int) : Maximum tree depth
+		learning_rate (float) : Learning rate
+		min_child_weight (int) : Minimum number of threads in each node
+		subsample (float) : Proportion of sub-sample of each node
+		colsample_bytree (float) : proportion of subsample columns when building each tree
+		colsample_bylevel (float) : 
+		gamma (float) : Minimum loss of RMSE required to perform an additional partition on a node of the tree
+       
+
+	Returns:
+		model (XGBRegressor): contains the information concerning the created model
+	"""
 	model = XGBRegressor(seed=model_seed,
 		             n_estimators=n_estimators,
 		             max_depth=max_depth,
@@ -210,6 +351,21 @@ def create_model(X_train_scaled, y_train_scaled, model_seed, n_estimators, max_d
 
 
 def predict_train(model, X_train_scaled, y_train, scaler, train, cv, test):
+	"""Makes the predictions on the train data. Just to check the quality of the model.
+
+	Parameters:
+		model (XGBRegressor): contains the information concerning the created model
+		X_train_scaled (list) : closing prices for the train splited and scaled in another function
+		y_train (list) : closing prices for the train splited in another function
+		train (list): contains the data used for training
+		cv (list): contains the data used for validation
+		test (list): contains the data used for test
+		scaler (scaler): to scale the data
+       
+
+	Returns:
+
+	"""
 	est_scaled = model.predict(X_train_scaled)
 	est = est_scaled * math.sqrt(scaler.var_[0]) + scaler.mean_[0]
 	print("RMSE on train set = %0.3f" % math.sqrt(mean_squared_error(y_train, est)))
@@ -229,6 +385,21 @@ def predict_train(model, X_train_scaled, y_train, scaler, train, cv, test):
 
 
 def predict_test(model, y_cv, X_cv_scaled, cv, train, test):
+	"""Makes the predictions on the test data.
+
+	Parameters:
+		model (XGBRegressor): contains the information concerning the created model
+		y_cv (list) : closing prices for the train splited in another function
+		X_cv_scaled (list) : closing prices for the train splited and scaled in another function
+		train (list): contains the data used for training
+		cv (list): contains the data used for validation
+		test (list): contains the data used for test
+       
+
+	Returns:
+		rmse_before (float) : root mean squared error between the predictions and the right values
+
+	"""
 	est_scaled = model.predict(X_cv_scaled)
 	cv['est_scaled'] = est_scaled
 	cv['est'] = cv['est_scaled'] * cv['adj_close_std'] + cv['adj_close_mean']
@@ -259,6 +430,21 @@ def predict_test(model, y_cv, X_cv_scaled, cv, train, test):
 
 
 def XGBoost_n_estimators_max_depth(cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv):
+	"""Find the best values (which minimise the rmse) of n_estimators and max_depth.
+
+	Parameters:
+		cv (list): contains the data used for validation
+		X_train_scaled (list)
+		y_train_scaled (list)
+		X_cv_scaled (list)
+		y_cv (list)
+       
+
+	Returns:
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+
+	"""
 	param_name = 'n_estimators'
 	param_ex = range(10, 300, 10)
 	param2_name = 'max_depth'
@@ -311,6 +497,23 @@ def XGBoost_n_estimators_max_depth(cv, X_train_scaled, y_train_scaled, X_cv_scal
 
 
 def XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv):
+	"""Find the best values (which minimise the rmse) of learning_rate and min_child_weight.
+
+	Parameters:
+		cv (list): contains the data used for validation
+		X_train_scaled (list)
+		y_train_scaled (list)
+		X_cv_scaled (list)
+		y_cv (list)
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+       
+
+	Returns:
+		learning_rate_opt (float) : best value of the hyper-parameter
+		min_child_weight_opt (int) : best value of the hyper-parameter
+
+	"""
 	param_name = 'learning_rate'
 	param_ex = [0.001, 0.005, 0.01, 0.05, 0.1, 0.2]
 	param2_name = 'min_child_weight'
@@ -363,6 +566,25 @@ def XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt, cv,
 
 
 def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv):
+	"""Find the best values (which minimise the rmse) of subsample and gamma.
+
+	Parameters:
+		cv (list): contains the data used for validation
+		X_train_scaled (list)
+		y_train_scaled (list)
+		X_cv_scaled (list)
+		y_cv (list)
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+		learning_rate_opt (float) : best value of the hyper-parameter
+		min_child_weight_opt (int) : best value of the hyper-parameter
+       
+
+	Returns:
+		subsample_opt (float) : best value of the hyper-parameter
+		gamma_opt (float) : best value of the hyper-parameter
+	"""
+
 	param_name = 'subsample'
 	param_ex = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 	param2_name = 'gamma'
@@ -415,6 +637,27 @@ def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt,
 
 
 def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv):
+	"""Find the best values (which minimise the rmse) of colsample_bytree and colsample_bylevel.
+
+	Parameters:
+		cv (list): contains the data used for validation
+		X_train_scaled (list)
+		y_train_scaled (list)
+		X_cv_scaled (list)
+		y_cv (list)
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+		learning_rate_opt (float) : best value of the hyper-parameter
+		min_child_weight_opt (int) : best value of the hyper-parameter
+		subsample_opt (float) : best value of the hyper-parameter
+		gamma_opt (float) : best value of the hyper-parameter
+       
+
+	Returns:
+		colsample_bytree_opt (float) : best value of the hyper-parameter
+		colsample_bylevel_opt (float) : best value of the hyper-parameter
+		error_rate (float) : rmse with the new prediction
+	"""
 	param_name = 'colsample_bytree'
 	param_ex = [0.5, 0.6, 0.7, 0.8, 0.9, 1]
 	param2_name = 'colsample_bylevel'
@@ -467,6 +710,22 @@ def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt,
 
 
 def changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, error_rate):
+	"""Show the changes between old and new hyper-parameters and improved rmse.
+
+	Parameters:
+		rmse_before (float) : root mean squared error between the old predictions and the right values
+		error_rate (float) : rmse with the new prediction
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+		learning_rate_opt (float) : best value of the hyper-parameter
+		min_child_weight_opt (int) : best value of the hyper-parameter
+		subsample_opt (float) : best value of the hyper-parameter
+		gamma_opt (float) : best value of the hyper-parameter
+       
+
+	Returns:
+
+	"""
 	d = {'param': ['n_estimators', 'max_depth', 'learning_rate', 'min_child_weight', 'subsample', 'colsample_bytree', 'colsample_bylevel', 'gamma', 'rmse'],
 	     'original': [100, 3, 0.1, 1, 1, 1, 1, 0, rmse_before],
 	     'after_tuning': [n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, error_rate['rmse'].min()]}
@@ -476,6 +735,30 @@ def changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, m
 
 
 def final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample, n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, train, cv, test):
+	"""Create the new model (with the best values of the hyper-parameters.
+
+	Parameters:
+		X_train_cv_scaled (list)
+		y_train_cv_scaled (list)
+		X_sample_scaled (list)
+		y_sample (list)
+		rmse_before (float) : root mean squared error between the old predictions and the right values
+		error_rate (float) : rmse with the new prediction
+		n_estimators_opt (int) : best value of the hyper-parameter
+		max_depth_opt (int) : best value of the hyper-parameter
+		learning_rate_opt (float) : best value of the hyper-parameter
+		min_child_weight_opt (int) : best value of the hyper-parameter
+		subsample_opt (float) : best value of the hyper-parameter
+		gamma_opt (float) : best value of the hyper-parameter
+		cv (list): contains the data used for validation
+		test (list): contains the data used for test
+		scaler (scaler): to scale the data
+       
+
+	Returns:
+		est_df (dataFrame) : contains the predicted values and the time
+
+	"""
 	rmse, est = modelisation(X_train_cv_scaled,
 		                     y_train_cv_scaled,
 		                     X_sample_scaled,
@@ -517,6 +800,15 @@ def final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample,
 
 #################################################################################
 def main():
+	"""Main
+
+	Parameters:       
+
+	Returns:
+		df (dataFrame): contains the closing prices of the share and the time
+		est_df (dataFrame) : contains the predicted values and the time
+		lenTrain (int) : contains the number of training data
+	"""
 
 	stock = "AMZN.csv"
 	test_proportion = 0.15
