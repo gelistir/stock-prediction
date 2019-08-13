@@ -513,29 +513,6 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
     return predictions
 
 
-def max_profit(data, buy_time, method, periods, **kwargs):
-    """
-    On donne les données ‘data’, temps d'achat ‘buy_time’ sous forme
-    de chaine de caractère, on donne la méthode de prédiction ‘method’ qui est
-    une des fonctions ci-dessus et le nombre de points à prédire ‘periods’.
-    **kwrags correspond aux paramètres supplémentaires de certaines fonctions
-    de prédiction.
-
-    A faire : se débrouiller pour prédire les points à partir de
-    data['Close'][:startAt] comme données d'entrainement, on n'aura pas de
-    données de validation. Ensuite chercher simplement le max entre les indices
-    startAt et startAt + periods.
-
-    En fonction de l'indice de differentiation choisi, utiliser la fonction
-    inv_differenciate pour que le tableau ‘predictions’ soit utilisable.
-    """
-    startAt = data.index[data['Date'] == buy_time][0] # on cherche l'indice correspondant à la date
-    predictions = method(data, startAt, periods, **kwargs)
-
-
-    return predictions
-
-
 def getWeights(data, methods, iterations=10):
     weights = np.zeros(len(methods))
     text_trap = io.StringIO()
