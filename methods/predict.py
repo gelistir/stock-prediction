@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 import requests
-import sys, io
+import io
 import random
 
 
@@ -25,14 +25,16 @@ def differentiate(data, order=1):
     """
 
     data_diff = data.copy()
+    if order==0:
+        return data_diff
     if order==1:
-        data_diff['Close'] = data['Close'].diff()
-        data_diff.drop(data_diff.index[0], inplace=True)
+        data_diff['Close'] = data['Close'].diff().fillna(0)
+        #data_diff.drop(data_diff.index[0], inplace=True)
     elif order=='return-price':
-        data_diff['Close'] = data['Close'].diff() / data_diff['Close'].shift(periods=1)
-        data_diff.drop(data_diff.index[0], inplace=True)
+        data_diff['Close'] = data['Close'].diff().fillna(0,) / data_diff['Close'].shift(periods=1)
+        #data_diff.drop(data_diff.index[0], inplace=True)
     else:
-        data_diff['Close'] = data['Close'].diff()
+        data_diff['Close'] = data['Close'].diff().fillna(0)
         data_diff.drop(data_diff.index[0], inplace=True)
         data_diff = differentiate(data_diff, order-1)
 
@@ -115,16 +117,16 @@ def inv_differenciate(predictions, diff_order, last_value=None):
         return np.array(predictions)
     elif(diff_order==1):
         return_preds = []
-        return_preds.append(last_value)
-        for i in range(len(predictions)):
-            return_preds.append(predictions[i] + return_preds[i])
+        return_preds.append(last_value + predictions[0])
+        for i in range(len(predictions)-1):
+            return_preds.append(predictions[i+1] + return_preds[i])
 
         return np.array(return_preds)
     elif(diff_order=='return-price'):
         return_preds = []
-        return_preds.append(last_value)
-        for i in range(len(predictions)):
-            return_preds.append(predictions[i] * return_preds[i] + return_preds[i])
+        return_preds.append(predictions[0] * last_value + last_value)
+        for i in range(len(predictions)-1):
+            return_preds.append(predictions[i+1] * return_preds[i] + return_preds[i])
 
         return return_preds
 
@@ -330,7 +332,7 @@ def knn(data, startAt, stopAt=None):
         stopAt = len(data_copy)
 
     periods = stopAt - startAt
-    
+
     from fastai.tabular import add_datepart
     add_datepart(data_copy, 'Date')
     data_copy.drop('Elapsed', axis=1, inplace=True)
@@ -341,7 +343,7 @@ def knn(data, startAt, stopAt=None):
     data_copy['mon_fri'] = 0
     data_copy['mon_fri'].mask(data_copy['Dayofweek'].isin([0,4]), 1, inplace=True)
     data_copy['mon_fri'].where(data_copy['Dayofweek'].isin([0,4]), 0, inplace=True)
-    
+
     train = data_copy[:startAt]
     valid = data_copy[startAt:stopAt]
 
@@ -697,7 +699,7 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
     return predictions
 
 
-def getWeights(data, methods, iterations=10):
+def getWeights(data, methods, iterations=10, periods=10, diff_order=1):
     """
     Calculates the weights of the forecast methods to correct predictions.
 
@@ -707,21 +709,30 @@ def getWeights(data, methods, iterations=10):
         methods (list): The list of the methods to use (must pass a list
                         of functions, not a list of strings)
         iterations (int): Number of iterations
+            (default is 10)
+        periods (int): Lenght of individual forecasts
+            (default is 10)
+        diff_data (int/str): Order of the differenciation
+            (default is 1)
 
     Returns:
         (dict): A dictionnary with the methods function name and the
                 corresponding weight
     """
+
     weights = np.zeros(len(methods))
-    text_trap = io.StringIO()
+    diff_data = differentiate(data, diff_order).fillna(0)
+
     for i in range(iterations):
-        point = random.randint(100, len(data)-1)
-        actualValue = data['Close'][point+1]
+        point = random.randint(100, len(diff_data)-periods)
+        actual_values = data['Close'][point:point+periods].values
         predictions = np.zeros(len(methods))
+
+
         for j, method in enumerate(methods):
-            sys.stdout = text_trap # disable printing
-            predictions[j] = np.abs(method(data, point, point+2)[0] - actualValue)
-            sys.stdout = sys.__stdout__ # enable printing
+            preds = method(diff_data, point, point+periods)
+            forecasts = inv_differenciate(preds, diff_order, data['Close'][point-1])
+            predictions[j] = calculate_rms(forecasts, actual_values)
         try:
             predictions = 1/predictions / sum(1/predictions)
         except RuntimeWarning:
