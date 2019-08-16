@@ -699,7 +699,7 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
     return predictions
 
 
-def getWeights(data, methods, iterations=10, periods=10, diff_order=1):
+def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
     """
     Calculates the weights of the forecast methods to correct predictions.
 
