@@ -120,12 +120,12 @@ if (butPrgm == "2" ):
 					methods.append(prd.theta_method)
 					predictions.append(prd.theta_method(diff_data, startAt, alpha=0.12))
 					noms.append("theta_method")
-				
+
 
 				nb_method = nb_method + 1
 
 
-			weights = prd.getWeights(data, methods, iterations=10)
+			weights = prd.get_weights(data, methods, iterations=10)
 
 			arr = np.asarray(predictions)
 
@@ -137,7 +137,7 @@ if (butPrgm == "2" ):
 
 				predictions = final_prediction
 
-						
+
 
 		prix = data['Close']
 		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
