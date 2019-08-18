@@ -106,7 +106,7 @@ def inv_differenciate(predictions, diff_order, last_value=None):
 
     Parameters:
         predictions (list): The predicted values given by the forecast
-        diff_order (str): Order of the differenciation
+        diff_order (int/str): Order of the differenciation
         last_value (float): The last known value
 
     Returns:
@@ -149,7 +149,7 @@ def insert_predictions(data, predictions, startAt, stopAt, diff_order=0):
         predictions (list): The predicted values given by the forecast
         startAt (int): Index where the forecast starts
         stopAt (int): Index where the forecast stops
-        diff_order (str): Order of the differenciation
+        diff_order (int/str): Order of the differenciation
             (default is 0)
 
     Returns:
@@ -182,7 +182,7 @@ def plot_predictions(data, predictions, startAt, stopAt=0, diff_order=0, print_r
         predictions (list): The predicted values given by the forecast
         startAt (int): Index where the forecast starts
         stopAt (int): Index where the forecast stops
-        diff_order (str): Order of the differenciation
+        diff_order (int/str): Order of the differenciation
             (default is 0)
         print_rms (bool): Specifies wether the Root Mean Square error should be
                           printed
@@ -227,7 +227,7 @@ def moving_average(data, startAt, stopAt=None):
     """
     Applies the moving average to data to predict points whose index is
     between startAt and stopAt.
-    If stopAt is not provided, default value is the lenght of data.
+    If stopAt is not provided, default value is the length of data.
 
     Parameters:
         data (pandas.DataFrame): Data returned by prepare_data (may be
@@ -261,7 +261,7 @@ def linear_regression(data, startAt, stopAt=None):
     """
     Applies the linear regression method to data to predict points whose index
     is between startAt and stopAt.
-    If stopAt is not provided, default value is the lenght of data.
+    If stopAt is not provided, default value is the length of data.
 
     Parameters:
         data (pandas.DataFrame): Data returned by prepare_data (may be
@@ -313,7 +313,7 @@ def knn(data, startAt, stopAt=None):
     """
     Classifies the point between startAt and stopAt with the k-nearest
     neighbors method. Automaticaly finds the best number of neighbors.
-    If stopAt is not provided, default value is the lenght of data.
+    If stopAt is not provided, default value is the length of data.
 
     Parameters:
         data (pandas.DataFrame): Data returned by prepare_data (may be
@@ -374,7 +374,7 @@ def arima_auto(data, startAt, stopAt=None):
     """
     Applies the scikit lean auto_arima function to data to predict points whose
     index is between startAt and stopAt.
-    If stopAt is not provided, default value is the lenght of data.
+    If stopAt is not provided, default value is the length of data.
 
     Parameters:
         data (pandas.DataFrame): Data returned by prepare_data (may be
@@ -412,7 +412,7 @@ def prophet(data, startAt, stopAt=None):
     """
     Applies the Prophet algorithm to data to predict points whose index is
     between startAt and stopAt.
-    If stopAt is not provided, default value is the lenght of data.
+    If stopAt is not provided, default value is the length of data.
 
     Parameters:
         data (pandas.DataFrame): Data returned by prepare_data (may be
@@ -444,10 +444,6 @@ def prophet(data, startAt, stopAt=None):
     forecast = model.predict(close_prices)
 
     predictions = forecast['yhat'][startAt:stopAt]
-
-    if(do_rms):
-        rms = calculate_rms(valid['y'], predictions)
-        print(rms)
 
     return predictions
 

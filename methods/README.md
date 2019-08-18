@@ -25,4 +25,3 @@ This file contains the following functions:
 - `MLPRegression`
 - `theta_method`
 - `theta_method_2` _(not working)_
-- `max_profit` _(not implemented)_
