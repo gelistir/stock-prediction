@@ -10,7 +10,8 @@ source venv/bin/activate
 
 Then, install the required packages:
 
-```pip install -r requirements.txt
+```
+pip install -r requirements.txt
 ```
 
 ## Usage
