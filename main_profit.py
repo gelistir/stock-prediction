@@ -4,6 +4,7 @@ import methods.randomForest as RF
 import methods.predict as prd
 
 import numpy as np
+import pandas as pd
 
 import profit
 
@@ -16,6 +17,7 @@ if (butPrgm == "1" ):
 	print("Which method do you want to work with ?")
 	print(" 1. LSTM")
 	print(" 2. XGBoost")
+	print(" 3. Combination of both methods")
 	choixMethode = input("Enter the choice : ")
 
 	if (choixMethode == "1" ):
@@ -31,6 +33,20 @@ if (butPrgm == "1" ):
 		closing_price = []
 		for i in range(len(closing_price_tmp['est'])):
 			closing_price.append(closing_price_tmp['est'][lenTrain+i])
+	if (choixMethode == "3" ):
+		new_data = lstm.data()
+		closing_price_1, lenTrain, train, valid = lstm.predict(new_data)
+		prix = []
+		prix = new_data['close']
+		new_data, closing_price_tmp, lenTrain = boost.main()
+		closing_price_2 = []
+		for i in range(len(closing_price_tmp['est'])):
+			closing_price_2.append(closing_price_tmp['est'][lenTrain+i])
+		closing_price = []
+		for j in range(len(closing_price_1)):
+			predicted_price = closing_price_1[j] * 0.5 + closing_price_2[j] * 0.5
+			closing_price.append(predicted_price)
+		
 
 	profit.jourlejour(lenTrain, prix, closing_price)
 
