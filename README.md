@@ -4,7 +4,8 @@
 
 All the dependencies of the project are listed in the `requirements.txt` file. To install them, we recommend to use a virtual environment:
 
-```python3 -m venv venv/
+```
+python3 -m venv venv/
 source venv/bin/activate
 ```
 
