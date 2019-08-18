@@ -23,4 +23,11 @@ deactivate
 
 ## Usage
 
+The main functions are in the `methods/predict.py` file.
+In order to use them in a script import the package with:
+
+```python
+import methods.predict as prd
+```
+
 WIP
