@@ -31,7 +31,7 @@ def differentiate(data, order=1):
         data_diff['Close'] = data['Close'].diff().fillna(0)
         #data_diff.drop(data_diff.index[0], inplace=True)
     elif order=='return-price':
-        data_diff['Close'] = data['Close'].diff().fillna(0,) / data_diff['Close'].shift(periods=1)
+        data_diff['Close'] = (data['Close'].diff() / data['Close'].shift(periods=1)).fillna(0)
         #data_diff.drop(data_diff.index[0], inplace=True)
     else:
         data_diff['Close'] = data['Close'].diff().fillna(0)
@@ -128,7 +128,7 @@ def inv_differenciate(predictions, diff_order, last_value=None):
         for i in range(len(predictions)-1):
             return_preds.append(predictions[i+1] * return_preds[i] + return_preds[i])
 
-        return return_preds
+        return np.array(return_preds)
 
         # return np.array(return_preds)
         # predictions[0] = predictions[0] * last_value + last_value
