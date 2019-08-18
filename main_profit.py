@@ -104,6 +104,7 @@ if (butPrgm == "2" ):
 			while i[nb_method] != "0":
 				number = input("Number : ")
 				i.append(number)
+
 				if (i[nb_method] == "2"):
 					methods.append(prd.moving_average)
 					predictions.append(prd.moving_average(diff_data, startAt))
