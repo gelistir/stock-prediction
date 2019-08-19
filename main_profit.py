@@ -15,37 +15,135 @@ butPrgm = input("Enter the choice : ")
 
 if (butPrgm == "1" ):
 	print("Which method do you want to work with ?")
-	print(" 1. LSTM")
-	print(" 2. XGBoost")
-	print(" 3. Combination of both methods")
+	print(" 1. moving_average")
+	print(" 2. linear_regression")
+	print(" 3. knn")
+	print(" 4. prophet")
+	print(" 5. arima_auto")
+	print(" 6. MLPRegression")
+	print(" 7. svm")
+	print(" 8. theta_method")
+	print(" 9. LSTM")
+	print(" 10. XGBoost")
+	print(" 11. Combine (with weights) several methods")
 	choixMethode = input("Enter the choice : ")
 
-	if (choixMethode == "1" ):
+	if (choixMethode == "1" ) or (choixMethode == "2" ) or (choixMethode == "3" ) or (choixMethode == "4" ) or (choixMethode == "5" ) or (choixMethode == "6" ) or (choixMethode == "7" )  or (choixMethode == "8" ):
+		data = prd.prepare_data('AMZN', ['timestamp', 'close'])
+		startAt = 950
+		diff_order = 1
+		diff_data = prd.differentiate(data, diff_order)
+		predictions = []
+		if (choixMethode == "1" ):
+			for i in range(len(data)-startAt):
+				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "2" ):
+			for i in range(len(data)-startAt):
+				pred = prd.linear_regression(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "3" ):
+			for i in range(len(data)-startAt):
+				pred = prd.knn(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "4" ):
+			for i in range(len(data)-startAt):
+				pred = prd.prophet(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "5" ):
+			for i in range(len(data)-startAt):
+				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "6" ):
+			for i in range(len(data)-startAt):
+				pred = prd.svm(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "7" ):
+			for i in range(len(data)-startAt):
+				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+		if (choixMethode == "8" ):
+			for i in range(len(data)-startAt):
+				pred = prd.theta_method(diff_data, startAt+i, startAt+1+i)
+				predictions.append(pred)
+
+		prix = data['Close']
+		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
+		lenTrain = startAt
+
+	if (choixMethode == "9" ):
 		new_data = lstm.data()
 		closing_price, lenTrain, train, valid = lstm.predict(new_data)
 		prix = []
 		lenTrain = lenTrain + 2
 		prix = new_data['close']
-	if (choixMethode == "2" ):
+	if (choixMethode == "10" ):
 		new_data, closing_price_tmp, lenTrain = boost.main()
 		prix = []
 		prix = new_data['adj_close']
 		closing_price = []
 		for i in range(len(closing_price_tmp['est'])):
 			closing_price.append(closing_price_tmp['est'][lenTrain+i])
-	if (choixMethode == "3" ):
-		new_data = lstm.data()
-		closing_price_1, lenTrain, train, valid = lstm.predict(new_data)
-		prix = []
-		prix = new_data['close']
-		new_data, closing_price_tmp, lenTrain = boost.main()
-		closing_price_2 = []
-		for i in range(len(closing_price_tmp['est'])):
-			closing_price_2.append(closing_price_tmp['est'][lenTrain+i])
-		closing_price = []
-		for j in range(len(closing_price_1)):
-			predicted_price = closing_price_1[j] * 0.5 + closing_price_2[j] * 0.5
-			closing_price.append(predicted_price)
+	if (choixMethode == "11" ):
+		data = prd.prepare_data('AMZN', ['timestamp', 'close'])
+		startAt = 950
+		diff_order = 1
+		diff_data = prd.differentiate(data, diff_order)
+		print("Enter the number of the required methods (LSTM and XGBoost unavailable). To stop enter 0")
+		i = ["1"]
+		methods = []
+		nb_method = 0
+		predictions = []
+		noms = []
+		while i[nb_method] != "0":
+			number = input("Number : ")
+			i.append(number)
+			if (i[nb_method] == "1"):
+				methods.append(prd.moving_average)
+				predictions.append(prd.moving_average(diff_data, startAt))
+				noms.append("moving_average")
+			if (i[nb_method] == "2"):
+				methods.append(prd.linear_regression)
+				predictions.append(prd.linear_regression(diff_data, startAt))
+				noms.append("linear_regression")
+			if (i[nb_method] == "3"):
+				methods.append(prd.knn)
+				predictions.append(prd.knn(diff_data, startAt))
+				noms.append("knn")
+			if (i[nb_method] == "4"):
+				methods.append(prd.prophet)
+				predictions.append(prd.prophet(diff_data, startAt))
+				noms.append("prophet")
+			if (i[nb_method] == "5"):
+				methods.append(prd.arima_auto)
+				predictions.append(prd.arima_auto(diff_data, startAt))
+				noms.append("arima_auto")
+			if (i[nb_method] == "6"):
+				methods.append(prd.MLPRegression)
+				predictions.append(prd.MLPRegression(diff_data, startAt, hidden_layer_sizes=tuple([120]*10), activation='relu', olver='lbfgs', batch_size=350))
+				noms.append("MLPRegression")
+			if (i[nb_method] == "7"):
+				methods.append(prd.svm)
+				predictions.append(prd.svm(diff_data, startAt))
+				noms.append("svm")
+			if (i[nb_method] == "8"):
+				methods.append(prd.theta_method)
+				predictions.append(prd.theta_method(diff_data, startAt, alpha=0.12))
+				noms.append("theta_method")
+
+			nb_method = nb_method + 1
+
+		weights = prd.get_weights(data, methods, iterations=10)
+		arr = np.asarray(predictions)
+		final_prediction = arr[0] * weights.get(noms[0])
+
+		for j in range(1,nb_method-1):
+			final_prediction = final_prediction + arr[j] * weights.get(noms[j])
+
+			predictions = final_prediction
+		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
+		prix = data['Close']
+		lenTrain = startAt
 		
 
 	profit.jourlejour(lenTrain, prix, closing_price)
