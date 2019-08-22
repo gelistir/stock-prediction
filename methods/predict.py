@@ -443,7 +443,7 @@ def prophet(data, startAt, stopAt=None):
     close_prices = model.make_future_dataframe(periods=len(valid))
     forecast = model.predict(close_prices)
 
-    predictions = forecast['yhat'][startAt:stopAt]
+    predictions = forecast['yhat'][startAt:stopAt].values
 
     return predictions
 
