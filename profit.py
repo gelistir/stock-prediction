@@ -39,8 +39,8 @@ def jourlejour(lenTrain, prix, closing_price):
 		plt.show() # Historic of the profit
 
 
-		actuel = prix[:lenTrain-2+i]
-		last10 = prix[lenTrain+i-12:lenTrain+i-2]
+		actuel = prix[:lenTrain+1+i]
+		last10 = prix[lenTrain+i-9:lenTrain+i+1]
 
 		a = plt.subplot(2, 1, 1)
 		a.plot(actuel)
@@ -53,7 +53,7 @@ def jourlejour(lenTrain, prix, closing_price):
 		plt.show() # To trace past prices and zoom on the last 10
 
 
-		prix_prevu = closing_price[i+1]
+		prix_prevu = closing_price[i+3]
 		print("Current share price : ", prix_actuel)
 		print('Expected price at the next closing : ', prix_prevu, '\n') # Displays the next prediction
 
