@@ -44,19 +44,21 @@ All the forecast functions work the same manner and always give a list of values
 # Example
 
 ```python
-import methods.predict as predict
+import methods.predict as prd
 import matplotlib.pyplot as plt
 
-data = predict.prepare_data('GOOGL', distant=True, api_key='XXX') # replace with your key
+data = prd.prepare_data('GOOGL', distant=True, api_key='XXX') # replace with your key
 
 # Plot data
 plt.plot(data['Close'])
 plt.show()
 
 # Diffenrentiate data to make it stationnary
-diff_data = predict.differentiate(data, 'return-price')
+diff_data = prd.differentiate(data, 'return-price')
 
 ## Use KNN to get predictions
-predictions = predict.knn(diff_data, 987)
-predict.plot_predictions(data, predictions, 987, diff_order='return-price', print_rms=True) #diff_order='return-price' is mandatory to plot the predictions correctly, otherwise you will plot the differentiated predictions
+predictions = prd.knn(diff_data, 987)
+prd.plot_predictions(data, predictions, 987, diff_order='return-price', print_rms=True)
+# in plot_predictions, diff_order='return-price' is mandatory to plot the predictions correctly
+# otherwise you will plot the differentiated predictions
 ```
