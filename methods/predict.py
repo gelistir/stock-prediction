@@ -695,7 +695,7 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
     return predictions
 
 
-def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
+def get_weights(data, methods, stopAt=None, iterations=10, periods=10, diff_order=1):
     """
     Calculates the weights of the forecast methods to correct predictions.
 
@@ -704,9 +704,10 @@ def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
                                  differentiated)
         methods (list): The list of the methods to use (must pass a list
                         of functions, not a list of strings)
+        stopAt (int): The limit of the train data
         iterations (int): Number of iterations
             (default is 10)
-        periods (int): Lenght of individual forecasts
+        periods (int): Length of individual forecasts
             (default is 10)
         diff_data (int/str): Order of the differenciation
             (default is 1)
@@ -714,13 +715,24 @@ def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
     Returns:
         (dict): A dictionnary with the methods function name and the
                 corresponding weight
+
+    Raises:
+        RuntimeError: If stopAt is to low and if there is less than 101 train
+                      points, then raises an exception
     """
+    if stopAt is None:
+        stopAt = len(data)
+
+    if stopAt-periods < 101:
+        raise RuntimeError('There is no enough points in the train data '
+                           'to calulate weights, you need to increase '
+                           'the value of stopAt')
 
     weights = np.zeros(len(methods))
-    diff_data = differentiate(data, diff_order).fillna(0)
+    diff_data = differentiate(data, diff_order)
 
     for i in range(iterations):
-        point = random.randint(100, len(diff_data)-periods)
+        point = random.randint(100, stopAt-periods)
         actual_values = data['Close'][point:point+periods].values
         predictions = np.zeros(len(methods))
 
