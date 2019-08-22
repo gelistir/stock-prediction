@@ -5,7 +5,17 @@ import numpy as np
 def alternate_buy_sell(data, startAt, stopAt=None):
     """
     Buy, sell, buy, sell etc…
-    No predictions are made here, juste checking random profit
+    No predictions are made here, juste calculating a random profit
+
+    Parameters:
+        data (pandas.DataFrame): The formated data (see prepare_data
+                                 from methods.predict)
+        startAt (int): Index where the calulation should start
+        stopAt (int): Index where the calulation should stop
+            (default is None)
+
+    Return:
+        sum (list): Money owned against time
     """
     if stopAt is None:
         stopAt = len(data)
@@ -33,7 +43,23 @@ def alternate_buy_sell(data, startAt, stopAt=None):
 
 def auto(data, methods, thresholds, startAt, stopAt=None):
     """
+    Automatic profit maker, make it self the decision to buy, to sell
+    or to no nothing given some parameters.
 
+    Parameters:
+        data (pandas.DataFrame): The formated data (see prepare_data
+                                 from methods.predict)
+        methods (list): A list containing the forecasting functions used
+                        to predict values (from the methods.predict package)
+        thresholds (list): A list containing:
+                            - The buy threshold in percent (eg: 0.001 for 0.1%)
+                            - The sell threshold
+        startAt (int): Index where the calulation should start
+        stopAt (int): Index where the calulation should stop
+            (default is None)
+
+    Return:
+        sum (list): Money owned against time
     """
     if stopAt is None:
         stopAt = len(data)
