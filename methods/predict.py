@@ -706,7 +706,7 @@ def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
                         of functions, not a list of strings)
         iterations (int): Number of iterations
             (default is 10)
-        periods (int): Lenght of individual forecasts
+        periods (int): Length of individual forecasts
             (default is 10)
         diff_data (int/str): Order of the differenciation
             (default is 1)
