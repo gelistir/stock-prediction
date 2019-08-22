@@ -78,7 +78,7 @@ if (butPrgm == "1" ):
 		new_data = lstm.data()
 		closing_price, lenTrain, train, valid = lstm.predict(new_data)
 		prix = []
-		lenTrain = lenTrain + 2
+		lenTrain = lenTrain+2
 		prix = new_data['close']
 	if (choixMethode == "10" ): # To prepare data and make prediction with XGBoost
 		new_data, closing_price_tmp, lenTrain = boost.main()
