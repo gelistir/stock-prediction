@@ -1,3 +1,4 @@
+
 import methods.lstm as lstm
 import methods.boost as boost
 import methods.randomForest as RF
@@ -10,8 +11,10 @@ import profit
 
 print("What kind of methods do you want to work with ?")
 print(" 1. Methods that predict from interval to interval")
-print(" 2. Methods that directly predict the entire period ")
+print(" 2. Methods that directly predict the entire period")
 butPrgm = input("Enter the choice : ")
+
+### To predict from interval to interval
 
 if (butPrgm == "1" ):
 	print("\nWhich method do you want to work with ?")
@@ -28,13 +31,13 @@ if (butPrgm == "1" ):
 	print(" 11. Combine (with weights) several methods")
 	choixMethode = input("Enter the choice : ")
 
-	if (choixMethode == "1" ) or (choixMethode == "2" ) or (choixMethode == "3" ) or (choixMethode == "4" ) or (choixMethode == "5" ) or (choixMethode == "6" ) or (choixMethode == "7" )  or (choixMethode == "8" ):
+	if (choixMethode == "1" ) or (choixMethode == "2" ) or (choixMethode == "3" ) or (choixMethode == "4" ) or (choixMethode == "5" ) or (choixMethode == "6" ) or (choixMethode == "7" )  or (choixMethode == "8" ): # To prepare data (it's different for LSTM anf XGBoost)
 		data = prd.prepare_data('AMZN', ['timestamp', 'close'])
 		startAt = 950
 		diff_order = 1
 		diff_data = prd.differentiate(data, diff_order)
 		predictions = []
-		if (choixMethode == "1" ):
+		if (choixMethode == "1" ): # To make predictions from interval to interval with the chosen method
 			for i in range(len(data)-startAt):
 				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
 				predictions.append(pred)
@@ -71,20 +74,20 @@ if (butPrgm == "1" ):
 		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
 		lenTrain = startAt
 
-	if (choixMethode == "9" ):
+	if (choixMethode == "9" ): # To prepare data and make prediction with LSTM
 		new_data = lstm.data()
 		closing_price, lenTrain, train, valid = lstm.predict(new_data)
 		prix = []
 		lenTrain = lenTrain + 2
 		prix = new_data['close']
-	if (choixMethode == "10" ):
+	if (choixMethode == "10" ): # To prepare data and make prediction with XGBoost
 		new_data, closing_price_tmp, lenTrain = boost.main()
 		prix = []
 		prix = new_data['adj_close']
 		closing_price = []
 		for i in range(len(closing_price_tmp['est'])):
 			closing_price.append(closing_price_tmp['est'][lenTrain+i])
-	if (choixMethode == "11" ):
+	if (choixMethode == "11" ): # To combine several methods and use weights
 		data = prd.prepare_data('AMZN', ['timestamp', 'close'])
 		startAt = 950
 		diff_order = 1
@@ -95,7 +98,7 @@ if (butPrgm == "1" ):
 		nb_method = 0
 		predictions = []
 		noms = []
-		while i[nb_method] != "0":
+		while i[nb_method] != "0": # Make predictions with the different chosen methods
 			number = input("Number : ")
 			i.append(number)
 			if (i[nb_method] == "1"):
@@ -138,20 +141,20 @@ if (butPrgm == "1" ):
 		final_prediction = arr[0] * weights.get(noms[0])
 
 		for j in range(1,nb_method-1):
-			final_prediction = final_prediction + arr[j] * weights.get(noms[j])
+			final_prediction = final_prediction + arr[j] * weights.get(noms[j]) # Weighted sum to have the final prediction
 
-			predictions = final_prediction
+		predictions = final_prediction
 		
 		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
 		prix = data['Close']
 		lenTrain = startAt
 		
 
-	profit.jourlejour(lenTrain, prix, closing_price)
+	profit.jourlejour(lenTrain, prix, closing_price) # To run the simulation to make a profit
 
 
 
-
+### To predict directly the entire period
 
 if (butPrgm == "2" ):
 	print("Which method do you want to work with ?")
@@ -168,16 +171,16 @@ if (butPrgm == "2" ):
 	choixMethode = input("Enter the choice : ")
 
 	if (choixMethode == "1" ):
-		data, predictions, startAt, train, valid = RF.main()
+		data, predictions, startAt, train, valid = RF.main() # Random Forest don't run as the others methods
 		prix = data['Close']
 		closing_price = prd.inv_differenciate(predictions, 1, data['Close'][startAt-1])
 		lenTrain = startAt
 	else:
-		data = prd.prepare_data('AMZN', ['timestamp', 'close'])
+		data = prd.prepare_data('AMZN', ['timestamp', 'close']) # To prepare data 
 		startAt = 950
 		diff_order = 1
 		diff_data = prd.differentiate(data, diff_order)
-		if (choixMethode == "2"):
+		if (choixMethode == "2"): # To make the prediction for the entire period with the chosen method
 		 	predictions = prd.moving_average(diff_data, startAt)
 		if (choixMethode == "3"):
 		 	predictions = prd.linear_regression(diff_data, startAt)
@@ -193,14 +196,14 @@ if (butPrgm == "2" ):
 		 	predictions = prd.svm(diff_data, startAt)
 		if (choixMethode == "9"):
 		 	predictions = prd.theta_method(diff_data, startAt, alpha=0.12)
-		if (choixMethode == "10"):
+		if (choixMethode == "10"): # To combine several methods and use weights
 			print("Enter the number of the required methods (Random Forest unavailable). To stop enter 0")
 			i = ["1"]
 			methods = []
 			nb_method = 0
 			predictions = []
 			noms = []
-			while i[nb_method] != "0":
+			while i[nb_method] != "0": # Make predictions with the different chosen methods
 				number = input("Number : ")
 				i.append(number)
 
@@ -248,10 +251,10 @@ if (butPrgm == "2" ):
 			final_prediction = arr[0] * weights.get(noms[0])
 			print(weights.get(noms[0]))
 			for j in range(1,nb_method-1):
-				final_prediction = final_prediction + arr[j] * weights.get(noms[j])
+				final_prediction = final_prediction + arr[j] * weights.get(noms[j])  # Weighted sum to have the final prediction
 				print(weights.get(noms[j]))
 
-				predictions = final_prediction
+			predictions = final_prediction
 
 
 
@@ -259,4 +262,6 @@ if (butPrgm == "2" ):
 		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
 		lenTrain = startAt
 
-	profit.periodecomplete(lenTrain, prix, closing_price)
+	profit.periodecomplete(lenTrain, prix, closing_price) # To run the simulation to make a profit
+
+
