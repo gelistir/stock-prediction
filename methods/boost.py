@@ -22,7 +22,7 @@ def load_data(stock):
        
 
 	Returns:
-		df (dataFrame): contains the closing prices of the share and the time
+		df (pd.DataFrame): contains the closing prices of the share and the time
 	"""
 	df = pd.read_csv(stock, sep = ",")
 	df.loc[:, 'Date'] = pd.to_datetime(df['timestamp'],format='%Y-%m-%d %H:%M:%S')
