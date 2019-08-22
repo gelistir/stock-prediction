@@ -20,10 +20,11 @@ def jourlejour(lenTrain, prix, closing_price):
 	histo_argent = [0.0]
 	gains = 0.0
 	histo_gains = [0.0]
+	prix_actuel_tmp = 0.0
 	for i in range(0,len(prix)-lenTrain):
 
 		prix_actuel = prix[lenTrain+i]
-		print('\nHere is your current portfolio \nMoney :', argent, '\nShares held : ', action_detenu, '(unit cost ', prix_actuel, ')\nThis means a total gain/loss of : ', gains, '\n')
+		print('\nHere is your current portfolio \nMoney :', argent, '\nShares held : ', action_detenu, '(unit cost ', prix_actuel_tmp, ')\nThis means a total gain/loss of : ', gains, '\n')
 
 		c = plt.subplot(1, 2, 1)	
 		c.plot(histo_gains, 'g')
@@ -77,6 +78,7 @@ def jourlejour(lenTrain, prix, closing_price):
 		gains = argent+action_detenu*prix_actuel
 		histo_gains.append(gains)
 		histo_argent.append(argent)
+		prix_actuel_tmp = prix_actuel
 
 		rep = input('Do you want to continue ? [y/n] ')
 		if rep == 'n':
@@ -125,7 +127,7 @@ def periodecomplete(lenTrain, prix, closing_price):
 	b.set_ylabel('Closing price (in dollars)')
 	plt.show()
 
-	print('With the chosen method, it is estimated that the maximum gain per share will be ', gain)
+	print('\nWith the chosen method, it is estimated that the maximum gain per share will be ', gain)
 	print("Current price (of possible purchase) : ", prix_actuel, " / Estimated maximum price (of possible sale) : ", max_prediction)
 	rep = input('Do you want to take the risk and buy shares ? [y/n] ')
 	if rep == 'y':
