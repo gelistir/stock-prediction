@@ -695,7 +695,7 @@ def theta_method_2(data, startAt, stopAt=None, theta=0, alpha=0.5):
     return predictions
 
 
-def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
+def get_weights(data, methods, stopAt=None, iterations=10, periods=10, diff_order=1):
     """
     Calculates the weights of the forecast methods to correct predictions.
 
@@ -715,12 +715,14 @@ def get_weights(data, methods, iterations=10, periods=10, diff_order=1):
         (dict): A dictionnary with the methods function name and the
                 corresponding weight
     """
+    if stopAt is None:
+        stopAt = len(data)
 
     weights = np.zeros(len(methods))
-    diff_data = differentiate(data, diff_order).fillna(0)
+    diff_data = differentiate(data, diff_order)
 
     for i in range(iterations):
-        point = random.randint(100, len(diff_data)-periods)
+        point = random.randint(100, stopAt-periods)
         actual_values = data['Close'][point:point+periods].values
         predictions = np.zeros(len(methods))
 
