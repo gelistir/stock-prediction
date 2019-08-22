@@ -14,7 +14,7 @@ print(" 2. Methods that directly predict the entire period ")
 butPrgm = input("Enter the choice : ")
 
 if (butPrgm == "1" ):
-	print("Which method do you want to work with ?")
+	print("\nWhich method do you want to work with ?")
 	print(" 1. moving_average")
 	print(" 2. linear_regression")
 	print(" 3. knn")
@@ -52,15 +52,15 @@ if (butPrgm == "1" ):
 				predictions.append(pred)
 		if (choixMethode == "5" ):
 			for i in range(len(data)-startAt):
-				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
+				pred = prd.arima_auto(diff_data, startAt+i, startAt+1+i)
 				predictions.append(pred)
 		if (choixMethode == "6" ):
 			for i in range(len(data)-startAt):
-				pred = prd.svm(diff_data, startAt+i, startAt+1+i)
+				pred = prd.MLPRegression(diff_data, startAt+i, startAt+1+i)
 				predictions.append(pred)
 		if (choixMethode == "7" ):
 			for i in range(len(data)-startAt):
-				pred = prd.moving_average(diff_data, startAt+i, startAt+1+i)
+				pred = prd.svm(diff_data, startAt+i, startAt+1+i)
 				predictions.append(pred)
 		if (choixMethode == "8" ):
 			for i in range(len(data)-startAt):
@@ -141,6 +141,7 @@ if (butPrgm == "1" ):
 			final_prediction = final_prediction + arr[j] * weights.get(noms[j])
 
 			predictions = final_prediction
+		
 		closing_price = prd.inv_differenciate(predictions, diff_order, data['Close'][startAt-1])
 		prix = data['Close']
 		lenTrain = startAt
