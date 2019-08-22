@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+##### Simulation for an interval to interval method
+
 def jourlejour(lenTrain, prix, closing_price):
 	"""Launches the simulation for a method that makes predictions from t to t+1
 
@@ -15,7 +17,7 @@ def jourlejour(lenTrain, prix, closing_price):
 	Returns:
 
 	"""
-	action_detenu = 0
+	action_detenu = 0 # Intialisation
 	argent = 0.0
 	histo_argent = [0.0]
 	gains = 0.0
@@ -24,7 +26,7 @@ def jourlejour(lenTrain, prix, closing_price):
 	for i in range(0,len(prix)-lenTrain):
 
 		prix_actuel = prix[lenTrain+i]
-		print('\nHere is your current portfolio \nMoney :', argent, '\nShares held : ', action_detenu, '(unit cost ', prix_actuel_tmp, ')\nThis means a total gain/loss of : ', gains, '\n')
+		print('\nHere is your current portfolio \nMoney :', argent, '\nShares held : ', action_detenu, '(unit cost ', prix_actuel_tmp, ')\nThis means a total gain/loss of : ', gains, '\n') # Displays our portfolio at each step
 
 		c = plt.subplot(1, 2, 1)	
 		c.plot(histo_gains, 'g')
@@ -34,7 +36,7 @@ def jourlejour(lenTrain, prix, closing_price):
 		d.plot(histo_argent, 'g')
 		d.set_title("History of the money in our possession")
 		d.set_ylabel('Money (in dollars)')
-		plt.show()
+		plt.show() # Historic of the profit
 
 
 		actuel = prix[:lenTrain-2+i]
@@ -48,14 +50,14 @@ def jourlejour(lenTrain, prix, closing_price):
 		b.plot(last10)
 		b.set_title('Focus on the last 10 closing prices')
 		b.set_ylabel('Closing price (in dollars)')
-		plt.show()
+		plt.show() # To trace past prices and zoom on the last 10
 
 
 		prix_prevu = closing_price[i+1]
 		print("Current share price : ", prix_actuel)
-		print('Expected price at the next closing : ', prix_prevu, '\n')
+		print('Expected price at the next closing : ', prix_prevu, '\n') # Displays the next prediction
 
-		rep = input('Do you want to buy ? [y/n] ')
+		rep = input('Do you want to buy ? [y/n] ') # Decisions
 		if rep == 'y':
 			nb = input('How many do you want to buy ? ')
 			action_detenu = action_detenu + int(nb)
@@ -93,9 +95,11 @@ def jourlejour(lenTrain, prix, closing_price):
 	d.plot(histo_argent, 'g')
 	d.set_title("History of the money in our possession")
 	d.set_ylabel('Money (in dollars)')
-	plt.show()
+	plt.show() # Displays the final portfolio and the historic of the profit
 
-##########################################################
+
+
+##### Simulation for an entire period method
 
 def periodecomplete(lenTrain, prix, closing_price):
 	"""Launches the simulation for a method that makes predictions for the entier period
@@ -109,7 +113,7 @@ def periodecomplete(lenTrain, prix, closing_price):
 	Returns:
 
 	"""
-	prix_actuel = prix[lenTrain-1]
+	prix_actuel = prix[lenTrain-1] # Initialisation
 	max_prediction = max(closing_price)
 	gain = max_prediction - prix_actuel
 	ind = np.argmax(closing_price)
@@ -125,12 +129,12 @@ def periodecomplete(lenTrain, prix, closing_price):
 	b.plot(last10)
 	b.set_title('Focus on the last 10 closing prices')
 	b.set_ylabel('Closing price (in dollars)')
-	plt.show()
+	plt.show() # To trace past prices and zoom on the last 10
 
 	print('\nWith the chosen method, it is estimated that the maximum gain per share will be ', gain)
 	print("Current price (of possible purchase) : ", prix_actuel, " / Estimated maximum price (of possible sale) : ", max_prediction)
-	rep = input('Do you want to take the risk and buy shares ? [y/n] ')
-	if rep == 'y':
+	rep = input('Do you want to take the risk and buy shares ? [y/n] ') # Decisions
+	if rep == 'y': # Results of the simulation
 		nb = input('How many do you want to buy ? ')
 		argent = - int(nb) * prix_actuel
 		print("\nFinally, the actual share price at the time it was expected to be max is ", prix_reel)
