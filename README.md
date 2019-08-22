@@ -30,4 +30,33 @@ In order to use them in a script import the package with:
 import methods.predict as prd
 ```
 
-WIP
+To retreive data either use the `data` folder or get an [AlphaVantage API key](https://www.alphavantage.co/).
+Then, to import the stock dataframe use:
+
+```python
+data = prd.prepare_data('data/GOOGL') # for offline data from data folder
+data = prd.prepare_data('GOOGL', distant=True, api_key='your_key'): # for realtime data
+```
+
+Please read [the function available](/methods/README.md#methods-package) in the predict file.
+All the forecast functions work the same manner and always give a list of values as a prediction.
+
+# Example
+
+```python
+import methods.predict as predict
+import matplotlib.pyplot as plt
+
+data = predict.prepare_data('GOOGL', distant=True, api_key='XXX') # replace with your key
+
+# Plot data
+plt.plot(data['Close'])
+plt.show()
+
+# Diffenrentiate data to make it stationnary
+diff_data = predict.differentiate(data, 'return-price')
+
+## Use KNN to get predictions
+predictions = predict.knn(diff_data, 987)
+predict.plot_predictions(data, predictions, 987, diff_order='return-price', print_rms=True) #diff_order='return-price' is mandatory to plot the predictions correctly, otherwise you will plot the differentiated predictions
+```
