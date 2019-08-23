@@ -90,15 +90,15 @@ def auto(data, methods, thresholds, startAt, stopAt=None, verbose=False):
             print('[{}] Variation: {}'.format(i, prediction))
 
         if prediction>0 and prediction>buy: # we buy what we can afford
-            nb_in_stocks = nb_in_stocks + in_bank/current_close
-            in_bank = 0
             if verbose:
                 print('  BUY : {} units at ${}'.format(in_bank/current_close, current_close))
+            nb_in_stocks = nb_in_stocks + in_bank/current_close
+            in_bank = 0
         elif prediction<0 and abs(prediction)>sell: # we sell all
-            in_bank = in_bank + nb_in_stocks * current_close
-            nb_in_stocks = 0
             if verbose:
                 print('  SELL: {} units at ${}'.format(nb_in_stocks, current_close))
+            in_bank = in_bank + nb_in_stocks * current_close
+            nb_in_stocks = 0
         elif verbose:
             print('  NOTHING TO DO')
 
