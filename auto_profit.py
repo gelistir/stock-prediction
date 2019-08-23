@@ -41,7 +41,7 @@ def alternate_buy_sell(data, startAt, stopAt=None):
     return sum
 
 
-def auto(data, methods, thresholds, startAt, stopAt=None):
+def auto(data, methods, thresholds, startAt, stopAt=None, verbose=False):
     """
     Automatic profit maker, make it self the decision to buy, to sell
     or to no nothing given some parameters.
@@ -57,6 +57,7 @@ def auto(data, methods, thresholds, startAt, stopAt=None):
         startAt (int): Index where the calulation should start
         stopAt (int): Index where the calulation should stop
             (default is None)
+        verbose (boolean): Indicates if each step should be detailed
 
     Return:
         sum (list): Money owned against time
@@ -82,15 +83,23 @@ def auto(data, methods, thresholds, startAt, stopAt=None):
             pred[i] = method(diff_data, startAt, startAt+2)[0] * weights[method.__name__]
         prediction = pred.sum()
 
+        if verbose:
+            print('[{}] Varation: {}'.format(i, prediction))
+
         current_close = data['Close'][startAt + i]
 
         if prediction>0 and prediction>buy: # we buy what we can afford
             nb_stocks = nb_stocks + in_bank/current_close
             in_bank = in_bank - in_bank/current_close
-
-        if prediction<0 and abs(prediction)>sell: # we sell all
+            if verbose:
+                print('  BUY : {} units at ${}'.format(in_bank/current_close, current_close))
+        elif prediction<0 and abs(prediction)>sell: # we sell all
             in_bank = in_bank + nb_stocks * current_close
             nb_stocks = 0
+            if verbose:
+                print('  SELL: {} units at ${}'.format(in_bank, current_close))
+        elif verbose:
+            print('  NOTHING TO DO')
 
         sum.append(in_bank + nb_in_stocks * data['Close'][startAt + i])
 
