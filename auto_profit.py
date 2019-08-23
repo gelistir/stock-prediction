@@ -69,7 +69,7 @@ def auto(data, methods, thresholds, startAt, stopAt=None):
 
     diff_data = prd.differentiate(data, 'return-price')
 
-    weights = prd.get_weights(data, methods, stopAt=stopAt, iterations=10, periods=10, diff_order='return-price')
+    weights = prd.get_weights(data, methods, stopAt=startAt, iterations=10, periods=10, diff_order='return-price')
 
     in_bank = 0
     nb_in_stocks = 1
