@@ -38,10 +38,10 @@ data = prd.prepare_data('data/GOOGL') # for offline data from data folder
 data = prd.prepare_data('GOOGL', distant=True, api_key='your_key'): # for realtime data
 ```
 
-Please read [the available functions](/methods/README.md#methods-package) in the predict file.
+Please check [the available functions](/methods/README.md#methods-package) in the predict file.
 All the forecast functions work the same manner and always give a list of values as a prediction.
 
-# Example
+### Example
 
 ```python
 import methods.predict as prd
