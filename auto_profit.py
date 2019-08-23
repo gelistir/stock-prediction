@@ -79,8 +79,8 @@ def auto(data, methods, thresholds, startAt, stopAt=None, verbose=False):
     for i in range(stopAt-startAt):
         # make prediction on next profit
         pred = np.zeros(len(methods))
-        for i, method in enumerate(methods):
-            pred[i] = method(diff_data, startAt, startAt+2)[0] * weights[method.__name__]
+        for j, method in enumerate(methods):
+            pred[j] = method(diff_data, startAt, startAt+2)[0] * weights[method.__name__]
         prediction = pred.sum()
 
         if verbose:
