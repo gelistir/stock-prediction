@@ -80,24 +80,25 @@ def auto(data, methods, thresholds, startAt, stopAt=None, verbose=False):
         # make prediction on next profit
         pred = np.zeros(len(methods))
         for j, method in enumerate(methods):
-            pred[j] = method(diff_data, startAt, startAt+2)[0] * weights[method.__name__]
+            pred[j] = method(data, startAt, startAt+1)[0] * weights[method.__name__]
         prediction = pred.sum()
 
-        if verbose:
-            print('[{}] Varation: {}'.format(i, prediction))
-
         current_close = data['Close'][startAt + i]
+        prediction = (current_close - prediction)/prediction
+
+        if verbose:
+            print('[{}] Variation: {}'.format(i, prediction))
 
         if prediction>0 and prediction>buy: # we buy what we can afford
-            nb_stocks = nb_stocks + in_bank/current_close
-            in_bank = in_bank - in_bank/current_close
+            nb_in_stocks = nb_in_stocks + in_bank/current_close
+            in_bank = 0
             if verbose:
                 print('  BUY : {} units at ${}'.format(in_bank/current_close, current_close))
         elif prediction<0 and abs(prediction)>sell: # we sell all
-            in_bank = in_bank + nb_stocks * current_close
-            nb_stocks = 0
+            in_bank = in_bank + nb_in_stocks * current_close
+            nb_in_stocks = 0
             if verbose:
-                print('  SELL: {} units at ${}'.format(in_bank, current_close))
+                print('  SELL: {} units at ${}'.format(nb_in_stocks, current_close))
         elif verbose:
             print('  NOTHING TO DO')
 
