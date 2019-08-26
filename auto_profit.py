@@ -34,7 +34,7 @@ def alternate_buy_sell(data, startAt, stopAt=None):
         sum.append(in_bank + nb_in_stocks * data['Close'][startAt + i])
 
     print('Initial total: {}\n - Stocks: {}\n  - Bank: {}\n\nFinal total: '
-    '{}\n - Stocks: {}\n - Bank {}'
+    '{}\n - Stocks: {}\n - Bank: {}'
     .format(data['Close'][startAt-1], data['Close'][startAt-1], 0,
     in_bank + nb_in_stocks*data['Close'][stopAt-1], nb_in_stocks*data['Close'][stopAt-1], in_bank))
 
