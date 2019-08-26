@@ -117,8 +117,8 @@ def plot(new_data, lenTrain, closing_price, train, valid):
 	
 ###################
 
-
+'''
 new_data = data()
 closing_price, lenTrain, train, valid = predict(new_data)
 plot(new_data, lenTrain, closing_price, train, valid)
-
+'''
