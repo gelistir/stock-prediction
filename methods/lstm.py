@@ -105,19 +105,20 @@ def plot(new_data, lenTrain, closing_price, train, valid):
 	train = new_data[:lenTrain]
 	valid = new_data[lenTrain:]
 	valid['Predictions'] = closing_price
+	rms = np.sqrt(np.mean(np.power((np.array(valid['close'])-np.array(valid['Predictions'])),2)))
 	plt.plot(train['close'])
 	plt.plot(valid[['close','Predictions']])
-	plt.title('LSTM')
+	plt.suptitle('RMS = ' + str(rms))
 	plt.show()
 	#rmse
-	rms = np.sqrt(np.mean(np.power((np.array(valid['close'])-np.array(valid['Predictions'])),2)))
+
 	print(rms)
 
 	
 ###################
 
-'''
+
 new_data = data()
 closing_price, lenTrain, train, valid = predict(new_data)
 plot(new_data, lenTrain, closing_price, train, valid)
-'''
+
