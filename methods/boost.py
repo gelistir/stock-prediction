@@ -446,9 +446,9 @@ def XGBoost_n_estimators_max_depth(cv, X_train_scaled, y_train_scaled, X_cv_scal
 
 	"""
 	param_name = 'n_estimators'
-	param_ex = range(10, 300, 10)
+	param_ex = range(20, 280, 10)
 	param2_name = 'max_depth'
-	param2_ex = [2, 3, 4, 5, 6, 7, 8]
+	param2_ex = [2, 3, 4, 5, 6, 7]
 	error_rate = {param_name: [] , param2_name: [], 'rmse': []}
 	for param in tqdm_notebook(param_ex):
 		for param2 in param2_ex:
@@ -471,7 +471,7 @@ def XGBoost_n_estimators_max_depth(cv, X_train_scaled, y_train_scaled, X_cv_scal
 			error_rate[param2_name].append(param2)
 			error_rate['rmse'].append(rmse)
 	error_rate = pd.DataFrame(error_rate)
-	'''
+	
 	# Plot performance versus params
 	temp = error_rate[error_rate[param2_name]==param2_ex[0]]
 	ax = temp.plot(x=param_name, y='rmse', style='bo-')
@@ -483,9 +483,9 @@ def XGBoost_n_estimators_max_depth(cv, X_train_scaled, y_train_scaled, X_cv_scal
 	    legend_list.append(param2_name + '_' + str(param2_ex[i]))
 	ax.set_xlabel(param_name)
 	ax.set_ylabel("RMSE")
-	plt.legend(legend_list, loc='best', bbox_to_anchor=(0.5, 1))
+	plt.legend(legend_list, loc='best')
 	plt.show()
-	'''
+	
 	# Get optimum value for param and param2, using RMSE
 	temp = error_rate[error_rate['rmse'] == error_rate['rmse'].min()]
 	n_estimators_opt = temp['n_estimators'].values[0]
@@ -515,9 +515,9 @@ def XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt, cv,
 
 	"""
 	param_name = 'learning_rate'
-	param_ex = [0.001, 0.005, 0.01, 0.05, 0.1, 0.2]
+	param_ex = [0.005, 0.01, 0.05, 0.1, 0.2]
 	param2_name = 'min_child_weight'
-	param2_ex = range(5, 20, 1)
+	param2_ex = range(5, 18, 1)
 	error_rate = {param_name: [] , param2_name: [], 'rmse': []}
 	for param in tqdm_notebook(param_ex):
 		for param2 in param2_ex:
@@ -540,7 +540,7 @@ def XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt, cv,
 			error_rate[param2_name].append(param2)
 			error_rate['rmse'].append(rmse)
 	error_rate = pd.DataFrame(error_rate)
-	'''
+	
 	# Plot performance versus params
 	temp = error_rate[error_rate[param2_name]==param2_ex[0]]
 	ax = temp.plot(x=param_name, y='rmse', style='bo-')
@@ -554,7 +554,7 @@ def XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt, cv,
 	ax.set_ylabel("RMSE")
 	plt.legend(legend_list, loc='best', bbox_to_anchor=(0.5, 1))
 	plt.show()
-	'''
+	
 	# Get optimum value for param and param2, using RMSE
 	temp = error_rate[error_rate['rmse'] == error_rate['rmse'].min()]
 	learning_rate_opt = temp['learning_rate'].values[0]
@@ -586,9 +586,9 @@ def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt,
 	"""
 
 	param_name = 'subsample'
-	param_ex = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+	param_ex = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
 	param2_name = 'gamma'
-	param2_ex = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+	param2_ex = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 	error_rate = {param_name: [] , param2_name: [], 'rmse': []}
 	for param in tqdm_notebook(param_ex):
 		for param2 in param2_ex:
@@ -611,7 +611,7 @@ def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt,
 			error_rate[param2_name].append(param2)
 			error_rate['rmse'].append(rmse)
 	error_rate = pd.DataFrame(error_rate)
-	'''
+	
 	# Plot performance versus params
 	temp = error_rate[error_rate[param2_name]==param2_ex[0]]
 	ax = temp.plot(x=param_name, y='rmse', style='bo-')
@@ -623,9 +623,9 @@ def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt,
 	    legend_list.append(param2_name + '_' + str(param2_ex[i]))
 	ax.set_xlabel(param_name)
 	ax.set_ylabel("RMSE")
-	plt.legend(legend_list, loc='best', bbox_to_anchor=(0.5, 1))
+	plt.legend(legend_list, loc='best')
 	plt.show()
-	'''
+	
 	# Get optimum value for param and param2, using RMSE
 	temp = error_rate[error_rate['rmse'] == error_rate['rmse'].min()]
 	subsample_opt = temp['subsample'].values[0]
@@ -633,9 +633,9 @@ def XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt,
 	print("min RMSE = %0.3f" % error_rate['rmse'].min())
 	print("optimum params = ")
 	print(subsample_opt, ' ', gamma_opt)
-	return subsample_opt, gamma_opt
+	return subsample_opt, gamma_opt, error_rate
 
-
+'''
 def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv):
 	"""Find the best values (which minimise the rmse) of colsample_bytree and colsample_bylevel.
 
@@ -684,7 +684,7 @@ def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt,
 			error_rate[param2_name].append(param2)
 			error_rate['rmse'].append(rmse)
 	error_rate = pd.DataFrame(error_rate)
-	'''
+	
 	# Plot performance versus params
 	temp = error_rate[error_rate[param2_name]==param2_ex[0]]
 	ax = temp.plot(x=param_name, y='rmse', style='bo-')
@@ -698,7 +698,7 @@ def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt,
 	ax.set_ylabel("RMSE")
 	plt.legend(legend_list, loc='best', bbox_to_anchor=(0.5, 1))
 	plt.show()
-	'''
+	
 	# Get optimum value for param and param2, using RMSE
 	temp = error_rate[error_rate['rmse'] == error_rate['rmse'].min()]
 	colsample_bytree_opt = temp['colsample_bytree'].values[0]
@@ -708,8 +708,8 @@ def XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt,
 	print(colsample_bytree_opt, ' ', colsample_bylevel_opt)
 	return colsample_bytree_opt, colsample_bylevel_opt, error_rate
 
-
-def changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, error_rate):
+'''
+def changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, error_rate):
 	"""Show the changes between old and new hyper-parameters and improved rmse.
 
 	Parameters:
@@ -726,9 +726,9 @@ def changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, m
 	Returns:
 
 	"""
-	d = {'param': ['n_estimators', 'max_depth', 'learning_rate', 'min_child_weight', 'subsample', 'colsample_bytree', 'colsample_bylevel', 'gamma', 'rmse'],
-	     'original': [100, 3, 0.1, 1, 1, 1, 1, 0, rmse_before],
-	     'after_tuning': [n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, error_rate['rmse'].min()]}
+	d = {'name': ['n_estimators', 'max_depth', 'learning_rate', 'min_child_weight', 'subsample', 'gamma', 'rmse'],
+	     'default': [100, 3, 0.1, 1, 1, 0, rmse_before],
+	     'optimized': [n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, error_rate['rmse'].min()]}
 	tuned_params = pd.DataFrame(d)
 	tuned_params = tuned_params.round(3)
 	print(tuned_params)
@@ -775,27 +775,24 @@ def final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample,
 		                     colsample_bylevel=colsample_bylevel_opt,
 		                     gamma=gamma_opt)
 	print("RMSE on test set = %0.3f" % rmse)
+
 	# Plot
 	est_df = pd.DataFrame({'est': est, 'y_sample': y_sample, 'date': test['date']})
-	'''
-	ax = train.plot( y='adj_close', style='g-', grid=True)
-	ax = cv.plot( y='adj_close', style='y-', grid=True, ax=ax)
-	ax = test.plot( y='adj_close', style='b-', grid=True, ax=ax)
-	ax = est_df.plot( y='est', style='r-', grid=True, ax=ax)
-	ax.legend(['train', 'dev', 'test', 'predictions'])
-	ax.set_ylabel("USD")
+	rms = np.sqrt(np.mean(np.power((np.array(test['adj_close'])-np.array(est_df['est'])),2)))
+	ax = train.plot(y='adj_close')
+	ax = cv.plot(y= 'adj_close', c='k', ax=ax)
+	ax = test.plot( y='adj_close', ax=ax)
+	plt.suptitle('RMS = ' + str(rms))
+	ax = est_df.plot( y='est', ax=ax)
 	
 	plt.show()
-	 Plot only for test set
-	ax = test.plot( y='adj_close', style='bx-', grid=True)
-	ax = est_df.plot( y='est', style='rx-', grid=True, ax=ax)
-	ax.legend(['test', 'predictions using xgboost'], loc='upper left')
-	ax.set_ylabel("USD")
-	plt.show()
-	'''
 
-	rms = np.sqrt(np.mean(np.power((np.array(test['adj_close'])-np.array(est_df['est'])),2)))
-	print(rms)
+	# Plot only for test set
+	ax = test.plot( y='adj_close')
+	ax = est_df.plot( y='est', ax=ax)
+	plt.suptitle('RMS = ' + str(rms))
+	plt.show()
+	
 	return est_df
 
 #################################################################################
@@ -848,19 +845,19 @@ def main():
 
 	learning_rate_opt, min_child_weight_opt = XGBoost_learning_rate_min_child_weight(n_estimators_opt,  max_depth_opt,cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv)
 
-	subsample_opt, gamma_opt = XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv)
+	subsample_opt, gamma_opt, error_rate = XGBoost_subsample_gamma(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv)
 
-	colsample_bytree_opt, colsample_bylevel_opt, error_rate = XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv)
+	#colsample_bytree_opt, colsample_bylevel_opt, error_rate = XGBoost_colsample_bytree_colsample_bylevel(n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, cv, X_train_scaled, y_train_scaled, X_cv_scaled, y_cv)
 
-	changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, error_rate)
+	changing(rmse_before, n_estimators_opt,  max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, gamma_opt, error_rate)
 
-	est_df = final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample, n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree_opt, colsample_bylevel_opt, gamma_opt, train, cv, test)
+	est_df = final_model(X_train_cv_scaled, y_train_cv_scaled, X_sample_scaled, y_sample, n_estimators_opt, max_depth_opt, learning_rate_opt, min_child_weight_opt, subsample_opt, colsample_bytree, colsample_bylevel, gamma_opt, train, cv, test)
 
 	lenTrain = len(train) + len(cv) + 3 # lignes Nan du début qui ne sont pas prises en compte
 
 	return df, est_df, lenTrain
 
-#df, est_df, lenTrain = main()
+# df, est_df, lenTrain = main()
 
 
 
