@@ -35,7 +35,7 @@ Then, to import the stock dataframe use:
 
 ```python
 data = prd.prepare_data('data/GOOGL') # for offline data from data folder
-data = prd.prepare_data('GOOGL', distant=True, api_key='your_key'): # for realtime data
+data = prd.prepare_data('GOOGL', distant=True, api_key='your_key') # for realtime data
 ```
 
 Please check [the available functions](/methods/README.md#methods-package) in the predict file.
