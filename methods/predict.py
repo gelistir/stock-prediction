@@ -58,7 +58,7 @@ def get_alpha_url(symbol, api_key, interval='5min'):
     return 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol='+symbol+'&interval='+interval+'&apikey='+api_key+'&datatype=csv&outputsize=full'
 
 
-def prepare_data(symbol, columns=['timestamp', 'close'], distant=False, api_key=None):
+def prepare_data(symbol, columns=['timestamp', 'close'], distant=False, api_key=None, interval='5min'):
     """
     Build a pandas.DataFrame containing the date and the close column.
     Get either the data from a csv file or from an API.
@@ -72,6 +72,8 @@ def prepare_data(symbol, columns=['timestamp', 'close'], distant=False, api_key=
                         from and API
             (default is False)
         api_key (str): API key provided by AlphaVantage
+        interval (str): Frequency of time series requested with the API
+            (default is '5min')
 
     Returns:
         new_data (pandas.DataFrame): Dataframe with date and close column
@@ -79,7 +81,7 @@ def prepare_data(symbol, columns=['timestamp', 'close'], distant=False, api_key=
     """
 
     if distant==True and api_key is not None:
-        urlData = requests.get(get_alpha_url(symbol, api_key)).content
+        urlData = requests.get(get_alpha_url(symbol, api_key, interval)).content
         if '"Note": "Thank you for using Alpha Vantage!' in str(urlData):
             raise RuntimeError('API limit reached')
 
