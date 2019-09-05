@@ -364,7 +364,7 @@ def knn(data, startAt, stopAt=None):
 
     params = {'n_neighbors':[2,3,4,5,6,7,8,9]}
     knn = neighbors.KNeighborsRegressor()
-    model = GridSearchCV(knn, params, cv=5)
+    model = GridSearchCV(knn, params, cv=5, iid=False)
 
     model.fit(x_train,y_train)
     predictions = model.predict(x_valid)
